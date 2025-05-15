@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Vintaze - Second Hand Clothing</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f7f5f2; color: #222; }
+        .vintaze-header { background: #2d2a26; color: #fff; }
+        .vintaze-header .navbar-brand { font-family: 'Georgia', serif; letter-spacing: 2px; font-size: 2rem; }
+        .vintaze-header .nav-link, .vintaze-header .cart-btn { color: #fff !important; font-weight: bold; }
+        .vintaze-header .cart-btn { position: relative; }
+        .cart-count { background: #e74c3c; color: #fff; border-radius: 50%; padding: 0.2em 0.6em; font-size: 0.9em; position: absolute; top: -8px; right: -18px; }
+        .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+        .product { 
+            background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; 
+            padding: 1rem; display: flex; flex-direction: column; align-items: center;
+            opacity: 0; transform: translateY(40px) scale(0.96);
+            animation: fadeInUp 0.7s forwards;
+        }
+        .product img { 
+            width: 180px; 
+            height: 220px; 
+            object-fit: cover; 
+            border-radius: 6px; 
+            transition: transform 0.3s, box-shadow 0.3s; 
+            box-shadow: 0 4px 16px #0002;
+            background: #eee;
+        }
+        .product:hover img { 
+            transform: scale(1.06) rotate(-2deg); 
+            box-shadow: 0 8px 24px #0003;
+            filter: brightness(1.08) saturate(1.1);
+        }
+        .product h3 { margin: 1rem 0 0.5rem; font-size: 1.2rem; }
+        .product p { margin: 0.5rem 0; }
+        .product button, .product .btn { background: #2d2a26; color: #fff; border: none; padding: 0.5rem 1.2rem; border-radius: 4px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; }
+        .product button:hover, .product .btn:hover { background: #444; }
+        #cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0007; justify-content: center; align-items: center; z-index: 1000; animation: fadeInBg 0.3s; }
+        #cart-content { background: #fff; padding: 2rem; border-radius: 8px; width: 90vw; max-width: 400px; animation: popIn 0.4s; }
+        #cart-content h2 { margin-top: 0; }
+        #cart-items { margin: 1rem 0; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.7rem; }
+        .cart-item span { margin: 0 0.5rem; }
+        .close-cart { background: #e74c3c; color: #fff; border: none; border-radius: 4px; padding: 0.3rem 0.8rem; cursor: pointer; float: right; }
+        .checkout-btn { background: #27ae60; color: #fff; border: none; border-radius: 4px; padding: 0.5rem 1.2rem; cursor: pointer; width: 100%; margin-top: 1rem; transition: background 0.2s; }
+        .checkout-btn:hover { background: #219150; }
+        @media (max-width: 600px) {
+            .products { grid-template-columns: 1fr; }
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0) scale(1);}
+        }
+        @keyframes fadeInBg {
+            from { background: #0000; }
+            to { background: #0007; }
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Vintaze - Second Hand Clothing</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f7f5f2; color: #222; }
+        header { background: #2d2a26; color: #fff; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { margin: 0; font-family: 'Georgia', serif; letter-spacing: 2px; }
+        nav a { color: #fff; text-decoration: none; margin-left: 2rem; font-weight: bold; }
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+        .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+        .product { 
+            background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; 
+            padding: 1rem; display: flex; flex-direction: column; align-items: center;
+            opacity: 0; transform: translateY(40px) scale(0.96);
+            animation: fadeInUp 0.7s forwards;
+        }
+        .product img { width: 180px; height: 220px; object-fit: cover; border-radius: 6px; transition: transform 0.3s; }
+        .product:hover img { transform: scale(1.06) rotate(-2deg); }
+        .product h3 { margin: 1rem 0 0.5rem; }
+        .product p { margin: 0.5rem 0; }
+        .product button { background: #2d2a26; color: #fff; border: none; padding: 0.5rem 1.2rem; border-radius: 4px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; }
+        .product button:hover { background: #444; }
+        .cart-btn { position: relative; }
+        .cart-count { background: #e74c3c; color: #fff; border-radius: 50%; padding: 0.2em 0.6em; font-size: 0.9em; position: absolute; top: -10px; right: -15px; }
+        #cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0007; justify-content: center; align-items: center; z-index: 1000; animation: fadeInBg 0.3s; }
+        #cart-content { background: #fff; padding: 2rem; border-radius: 8px; width: 90vw; max-width: 400px; animation: popIn 0.4s; }
+        #cart-content h2 { margin-top: 0; }
+        #cart-items { margin: 1rem 0; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.7rem; }
+        .cart-item span { margin: 0 0.5rem; }
+        .close-cart { background: #e74c3c; color: #fff; border: none; border-radius: 4px; padding: 0.3rem 0.8rem; cursor: pointer; float: right; }
+        .checkout-btn { background: #27ae60; color: #fff; border: none; border-radius: 4px; padding: 0.5rem 1.2rem; cursor: pointer; width: 100%; margin-top: 1rem; transition: background 0.2s; }
+        .checkout-btn:hover { background: #219150; }
+        @media (max-width: 600px) {
+            .products { grid-template-columns: 1fr; }
+            header { flex-direction: column; align-items: flex-start; }
+            nav { margin-top: 1rem; }
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0) scale(1);}
+        }
+        @keyframes fadeInBg {
+            from { background: #0000; }
+            to { background: #0007; }
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Vintaze</h1>
+        <nav>
+            <a href="#products">Produkty</a>
+            <a href="#" class="cart-btn" onclick="openCart()">
+                Koszyk <span class="cart-count" id="cart-count">0</span>
+            </a>
+        </nav>
+    </header>
+    <div class="container">
+        <section id="products">
+            <h2>Nasze produkty</h2>
+            <div class="products" id="products-list">
+                <!-- Products will be rendered here -->
+            </div>
+        </section>
+    </div>
+    <div id="cart-modal">
+        <div id="cart-content">
+            <button class="close-cart" onclick="closeCart()">X</button>
+            <h2>Twój koszyk</h2>
+            <div id="cart-items"></div>
+            <div id="cart-total"></div>
+            <button class="checkout-btn" onclick="checkout()">Zamów</button>
+        </div>
+    </div>
+    <script>
+        // Demo products - expanded
+        const products = [
+            // T-shirts
+            { id: 1, name: "T-shirt Vintage Levi's", price: 55, img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80", desc: "Biały t-shirt Levi's z lat 90." },
+            { id: 2, name: "T-shirt Adidas Retro", price: 49, img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80", desc: "Sportowy t-shirt Adidas." },
+            { id: 3, name: "T-shirt z nadrukiem", price: 39, img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80", desc: "Kolorowy nadruk, bawełna." },
+            { id: 4, name: "T-shirt Oversize", price: 45, img: "https://images.unsplash.com/photo-1469398715555-76331a6c7843?auto=format&fit=crop&w=400&q=80", desc: "Luźny, wygodny krój." },
+            { id: 5, name: "T-shirt Basic Czarny", price: 35, img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80", desc: "Czarny, klasyczny t-shirt." },
+            // Hoodies
+            { id: 6, name: "Bluza Champion", price: 99, img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80", desc: "Szara bluza z kapturem." },
+            { id: 7, name: "Bluza Nike Vintage", price: 110, img: "https://images.unsplash.com/photo-1469398715555-76331a6c7843?auto=format&fit=crop&w=400&q=80", desc: "Czarna bluza Nike." },
+            { id: 8, name: "Bluza z haftem", price: 89, img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80", desc: "Kolorowy haft na przodzie." },
+            { id: 9, name: "Bluza Oversize", price: 95, img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80", desc: "Wygodna, szeroka bluza." },
+            { id: 10, name: "Bluza Basic Granatowa", price: 85, img: "https://images.unsplash.com/photo-1469398715555-76331a6c7843?auto=format&fit=crop&w=400&q=80", desc: "Granatowa bluza z kapturem." },
+            // Jeans
+            { id: 11, name: "Vintage Jeansowa Kurtka", price: 120, img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80", desc: "Klasyczna kurtka jeansowa z lat 90." },
+            { id: 12, name: "Jeansy Mom Fit", price: 79, img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80", desc: "Wysoki stan, jasny jeans." },
+            { id: 13, name: "Jeansy Proste Niebieskie", price: 69, img: "https://images.unsplash.com/photo-1469398715555-76331a6c7843?auto=format&fit=crop&w=400&q=80", desc: "Prosty krój, klasyczny kolor." },
+            { id: 14, name: "Jeansy Czarne", price: 75, img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80", desc: "Czarne, lekko zwężane nogawki." },
+            { id: 15, name: "Jeansy z Przetarciami", price: 82, img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80", desc: "Modne przetarcia na kolanach." },
+            // Dresses
+            { id: 16, name: "Sukienka Retro w Kwiaty", price: 85, img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80", desc: "Zwiewna sukienka w kwiatowy wzór." },
+            { id: 17, name: "Sukienka Midi", price: 95, img: "https://images.unsplash.com/photo-1469398715555-76331a6c7843?auto=format&fit=crop&w=400&q=80", desc: "Elegancka midi, lata 80." },
+            { id: 18, name: "Sukienka Boho", price: 89, img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80", desc: "Styl boho, koronka." },
+            { id: 19, name: "Sukienka Jeansowa", price: 99, img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80", desc: "Jeansowa, na ramiączkach." },
+            { id: 20, name: "Sukienka Vintage Czerwona", price: 105, img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80", desc: "Czerwona, rozkloszowana." },
+            // Shirts
+            { id: 21, name: "Koszula w Kratę", price: 60, img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80", desc: "Bawełniana koszula w stylu vintage." },
+            { id: 22, name: "Koszula Jeansowa", price: 65, img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80", desc: "Jeansowa koszula, klasyk." },
+            { id: 23, name: "Koszula Biała", price: 55, img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80", desc: "Biała, elegancka koszula." },
+            { id: 24, name: "Koszula z Krótkim Rękawem", price: 50, img: "https://images.unsplash.com/photo-1469398715555-76331a6c7843?auto=format&fit=crop&w=400&q=80", desc: "Letnia, przewiewna koszula." },
+            { id: 25, name: "Koszula Kolorowa", price: 58, img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80", desc: "Kolorowy wzór, bawełna." },
+            // Sweaters
+            { id: 26, name: "Sweter Oversize", price: 95, img: "https://images.unsplash.com/photo-1469398715555-76331a6c7843?auto=format&fit=crop&w=400&q=80", desc: "Ciepły, wygodny sweter oversize." },
+            { id: 27, name: "Sweter z Golfem", price: 89, img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80", desc: "Sweter z wysokim golfem." },
+            { id: 28, name: "Sweter w Paski", price: 79, img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80", desc: "Kolorowe paski, bawełna." },
+            { id: 29, name: "Sweter Vintage", price: 99, img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80", desc: "Wzór retro, miękki materiał." },
+            { id: 30, name: "Sweter Basic Szary", price: 70, img: "https://images.unsplash.com/photo-1469398715555-76331a6c7843?auto=format&fit=crop&w=400&q=80", desc: "Szary, klasyczny sweter." }
+        ];
+
+        // Cart logic
+        let cart = JSON.parse(localStorage.getItem('vintaze_cart') || '[]');
+
+        function saveCart() {
+            localStorage.setItem('vintaze_cart', JSON.stringify(cart));
+        }
+
+        function renderProducts() {
+            const list = document.getElementById('products-list');
+            list.innerHTML = '';
+            products.forEach((prod, i) => {
+                const div = document.createElement('div');
+                div.className = 'product';
+                // Animation delay for staggered effect
+                div.style.animationDelay = (i * 0.07) + 's';
+                div.innerHTML = `
+                    <img src="${prod.img}" alt="${prod.name}">
+                    <h3>${prod.name}</h3>
+                    <p>${prod.desc}</p>
+                    <p><strong>${prod.price} zł</strong></p>
+                    <button onclick="addToCart(${prod.id})">Dodaj do koszyka</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addToCart(id) {
+            const idx = cart.findIndex(item => item.id === id);
+            if (idx > -1) {
+                cart[idx].qty += 1;
+            } else {
+                cart.push({ id, qty: 1 });
+            }
+            saveCart();
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const count = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cart-count').textContent = count;
+        }
+
+        function openCart() {
+            renderCart();
+            document.getElementById('cart-modal').style.display = 'flex';
+        }
+
+        function closeCart() {
+            document.getElementById('cart-modal').style.display = 'none';
+        }
+
+        function renderCart() {
+            const itemsDiv = document.getElementById('cart-items');
+            itemsDiv.innerHTML = '';
+            if (cart.length === 0) {
+                itemsDiv.innerHTML = '<p>Koszyk jest pusty.</p>';
+                document.getElementById('cart-total').textContent = '';
+                return;
+            }
+            let total = 0;
+            cart.forEach(item => {
+                const prod = products.find(p => p.id === item.id);
+                total += prod.price * item.qty;
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <span>${prod.name}</span>
+                    <span>
+                        <button onclick="changeQty(${item.id}, -1)">-</button>
+                        ${item.qty}
+                        <button onclick="changeQty(${item.id}, 1)">+</button>
+                    </span>
+                    <span>${prod.price * item.qty} zł</span>
+                    <button onclick="removeFromCart(${item.id})" style="background:#e74c3c;color:#fff;border:none;border-radius:3px;padding:0.2rem 0.5rem;cursor:pointer;">Usuń</button>
+                `;
+                itemsDiv.appendChild(div);
+            });
+            document.getElementById('cart-total').textContent = `Suma: ${total} zł`;
+        }
+
+        function changeQty(id, delta) {
+            const idx = cart.findIndex(item => item.id === id);
+            if (idx > -1) {
+                cart[idx].qty += delta;
+                if (cart[idx].qty <= 0) cart.splice(idx, 1);
+                saveCart();
+                renderCart();
+                updateCartCount();
+            }
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            saveCart();
+            renderCart();
+            updateCartCount();
+        }
+
+        function checkout() {
+            if (cart.length === 0) return;
+            alert('Dziękujemy za zamówienie! Skontaktujemy się w celu realizacji.');
+            cart = [];
+            saveCart();
+            closeCart();
+            updateCartCount();
+        }
+
+        // Initial render
+        renderProducts();
+        updateCartCount();
+    </script>
+</body>
+</html>
